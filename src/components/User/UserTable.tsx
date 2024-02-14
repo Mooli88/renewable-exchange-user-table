@@ -1,6 +1,8 @@
-import React from 'react'
+import { useState } from 'react'
+import { Query } from '../../api'
 import useUserQuery from '../../hooks/useUserQuery'
 import Table from '../Table/Table'
+import TableToolbar from '../Table/TableToolbar/TableToolbar'
 import UserTableBody from './UserTableBody/UserTableBody'
 
 // type Props = {}
@@ -15,7 +17,7 @@ const headCells = [
   },
   {
     id: 'company',
-    label: 'company',
+    label: 'Company',
   },
   {
     id: 'added',
@@ -24,13 +26,20 @@ const headCells = [
 ] as const
 
 const UserTable = () => {
-  const { data, isLoading } = useUserQuery()
+  const [filterBy, setFilterBy] = useState<Query>()
+  const { data, isLoading } = useUserQuery(filterBy)
 
   if (isLoading) return <div>Loading...</div>
 
   if (data)
     return (
-      <Table title='Users' data={data} headCells={headCells}>
+      <Table
+        title='Users'
+        data={data}
+        headCells={headCells}
+        onFilter={(filterBy, value) =>
+          setFilterBy({ filterBy, value } as Query)
+        }>
         <UserTableBody />
       </Table>
     )

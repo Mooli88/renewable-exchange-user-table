@@ -1,18 +1,15 @@
 import { Checkbox, TableBody, TableCell, TableRow } from '@mui/material'
-import React, { useContext } from 'react'
-import { TableContext } from '../../Table/Table'
+import { useContext } from 'react'
 import { User } from '../../../types'
-
-// type Props = {}
+import { TableContext } from '../../Table/Table'
 
 const UserTableBody = () => {
   const { rows, isSelected, handleClick } = useContext(TableContext)
 
   return (
     <TableBody>
-      {rows.map((row: User, index) => {
+      {(rows as User[]).map((row) => {
         const isItemSelected = isSelected(row.id)
-        // const labelId = `enhanced-table-checkbox-${index}`
 
         return (
           <TableRow
@@ -25,13 +22,7 @@ const UserTableBody = () => {
             selected={isItemSelected}
             sx={{ cursor: 'pointer' }}>
             <TableCell padding='checkbox'>
-              <Checkbox
-                color='primary'
-                checked={isItemSelected}
-                // inputProps={{
-                //   'aria-labelledby': labelId,
-                // }}
-              />
+              <Checkbox color='primary' checked={isItemSelected} />
             </TableCell>
             <TableCell>{row.name}</TableCell>
             <TableCell>{row.email}</TableCell>

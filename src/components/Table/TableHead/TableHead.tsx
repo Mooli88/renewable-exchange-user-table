@@ -5,20 +5,13 @@ import {
   TableRow,
   TableSortLabel,
 } from '@mui/material'
-import Box from '@mui/material/Box'
-// import Checkbox from '@mui/material/Checkbox'
-// import TableCell from '@mui/material/TableCell'
-// import TableRow from '@mui/material/TableRow'
-// import TableSortLabel from '@mui/material/TableSortLabel'
-import { visuallyHidden } from '@mui/utils'
 import * as React from 'react'
-
-
+import { useContext } from 'react'
+import { TableContext } from '../Table'
 
 export type Order = 'asc' | 'desc'
 
 type Props = {
-  numSelected: number
   onRequestSort: (property: string) => void
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void
   order: Order
@@ -31,11 +24,12 @@ const TableHead = ({
   onSelectAllClick,
   order,
   orderBy,
-  numSelected,
   rowCount,
   onRequestSort,
   headCells,
 }: Props) => {
+  const { numSelected } = useContext(TableContext)
+
   return (
     <MuiTableHead>
       <TableRow>

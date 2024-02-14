@@ -1,15 +1,8 @@
-import {
-  Box,
-  Paper,
-  Table as MuiTable,
-  TableContainer,
-  TableCell,
-} from '@mui/material'
+import { Box, Table as MuiTable, Paper, TableContainer } from '@mui/material'
 import { ChangeEvent, createContext, useMemo, useState } from 'react'
 import TableHead, { Order } from './TableHead/TableHead'
 import TableToolbar from './TableToolbar/TableToolbar'
-import useUserQuery from '../../hooks/useUserQuery'
-import { Key } from '@mui/icons-material'
+import Filter from './TableToolbar/Filter'
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -37,11 +30,13 @@ type Props = {
   data: ReadonlyArray<{ id: string; [Key: string]: string | number }>
   headCells: ReadonlyArray<{ id: string; label: string }>
   title: string
+  onFilter: (filterBy: string, value: string) => void
   children: React.ReactNode
 }
 
 type Ctx = {
   rows: Props['data']
+  numSelected: number
   isSelected: (id: string) => boolean
   handleClick: (id: string) => void
 }
@@ -50,12 +45,20 @@ export const TableContext = createContext<Ctx>({
   rows: [],
   isSelected: () => false,
   handleClick: () => false,
+  numSelected: 0,
 })
 
-const Table = ({ data, headCells, title, children }: Props) => {
+// const F = () => <Filter filterByCols={headCells} onChange={onFilter} />
+
+const Table = ({ data, headCells, title, onFilter, children }: Props) => {
   const [order, setOrder] = useState<Order>('asc')
   const [orderBy, setOrderBy] = useState('name')
   const [selected, setSelected] = useState<ReadonlyArray<string>>([])
+
+  const rows = useMemo(
+    () => data.slice().sort(getComparator(order, orderBy)),
+    [data, order, orderBy]
+  )
 
   const handleRequestSort = (property: string) => {
     const isAsc = orderBy === property && order === 'asc'
@@ -81,11 +84,6 @@ const Table = ({ data, headCells, title, children }: Props) => {
 
   const isSelected = (id: string) => selected.indexOf(id) !== -1
 
-  const rows = useMemo(
-    () => data.slice().sort(getComparator(order, orderBy)),
-    [data, order, orderBy]
-  )
-
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
@@ -94,15 +92,18 @@ const Table = ({ data, headCells, title, children }: Props) => {
             rows,
             isSelected,
             handleClick,
+            numSelected: selected.length,
           }}>
-          <TableToolbar title={title} numSelected={selected.length} />
+          <TableToolbar
+            title={title}
+            filter={<Filter filterByCols={headCells} onChange={onFilter} />}
+          />
           <TableContainer>
             <MuiTable sx={{ minWidth: 750 }} aria-labelledby='tableTitle'>
               <TableHead
-                headCells={headCells}
-                numSelected={selected.length}
                 order={order}
                 orderBy={orderBy}
+                headCells={headCells}
                 onSelectAllClick={handleSelectAllClick}
                 onRequestSort={handleRequestSort}
                 rowCount={rows.length}

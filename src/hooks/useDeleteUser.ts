@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
-import { getUsers, Query } from '../api'
+import { getUsers } from '../api'
 import { User } from '../types'
 
-const useUserQuery = (filter?: Query) => {
+export type FilterBy = 'none' | keyof Omit<User, 'id'>
+
+const useUserQuery = (filterBy: FilterBy = 'none', value: string) => {
   const userQuery = useQuery({
-    queryKey: ['users', filter],
-    queryFn: () => getUsers(filter),
+    queryKey: ['users', { filterBy, value }],
+    queryFn: () => getUsers({ filterBy, value }),
     select: (data): ReadonlyArray<User> =>
       data.map((user) => ({ ...user, id: user.email })),
     staleTime: Infinity,

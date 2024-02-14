@@ -1,12 +1,16 @@
+import { Delete } from '@mui/icons-material'
 import { IconButton, Toolbar, Tooltip, Typography, alpha } from '@mui/material'
-import { FilterList, Delete } from '@mui/icons-material'
+import { useContext } from 'react'
+import { TableContext } from '../Table'
 
 type Props = {
   title: string
-  numSelected: number
+  filter?: React.ReactNode
 }
 
-const TableToolbar = ({ title, numSelected }: Props) => {
+const TableToolbar = ({ title, filter }: Props) => {
+  const { numSelected } = useContext(TableContext)
+
   return (
     <Toolbar
       sx={{
@@ -43,13 +47,8 @@ const TableToolbar = ({ title, numSelected }: Props) => {
             <Delete />
           </IconButton>
         </Tooltip>
-      ) : (
-        <Tooltip title='Filter list'>
-          <IconButton>
-            <FilterList />
-          </IconButton>
-        </Tooltip>
-      )}
+      ) : null}
+      {filter}
     </Toolbar>
   )
 }
