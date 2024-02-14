@@ -13,26 +13,9 @@ import Box from '@mui/material/Box'
 import { visuallyHidden } from '@mui/utils'
 import * as React from 'react'
 
-const headCells = [
-  {
-    id: 'name',
-    label: 'Name',
-  },
-  {
-    id: 'email',
-    label: 'Email',
-  },
-  {
-    id: 'Company',
-    label: 'company',
-  },
-  {
-    id: 'added',
-    label: 'Added',
-  },
-] as const
 
-type Order = 'asc' | 'desc'
+
+export type Order = 'asc' | 'desc'
 
 type Props = {
   numSelected: number
@@ -41,6 +24,7 @@ type Props = {
   order: Order
   orderBy: string
   rowCount: number
+  headCells: ReadonlyArray<{ id: string; label: string }>
 }
 
 const TableHead = ({
@@ -50,6 +34,7 @@ const TableHead = ({
   numSelected,
   rowCount,
   onRequestSort,
+  headCells,
 }: Props) => {
   return (
     <MuiTableHead>
@@ -74,11 +59,6 @@ const TableHead = ({
               direction={orderBy === headCell.id ? order : 'asc'}
               onClick={() => onRequestSort(headCell.id)}>
               {headCell.label}
-              {orderBy === headCell.id ? (
-                <Box component='span' sx={visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </Box>
-              ) : null}
             </TableSortLabel>
           </TableCell>
         ))}

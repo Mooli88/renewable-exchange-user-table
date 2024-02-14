@@ -2,7 +2,9 @@
 
 import { User } from './types'
 
-export const getUsers = async (): Promise<User[]> => {
+type Data = Omit<User, 'id'>
+
+export const getUsers = async (): Promise<ReadonlyArray<Data>> => {
   const res = await fetch('https://zglinski.com/trex/users.json')
 
   return res.json()
