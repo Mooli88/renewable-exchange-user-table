@@ -5,10 +5,11 @@ import { TableContext } from '../Table'
 
 type Props = {
   title: string
-  filter?: React.ReactNode
+  onDelete: () => void
+  children?: React.ReactNode
 }
 
-const TableToolbar = ({ title, filter }: Props) => {
+const TableToolbar = ({ title, onDelete, children }: Props) => {
   const { numSelected } = useContext(TableContext)
 
   return (
@@ -35,20 +36,21 @@ const TableToolbar = ({ title, filter }: Props) => {
       ) : (
         <Typography
           sx={{ flex: '1 1 100%' }}
-          variant='h6'
+          variant='h5'
           id='tableTitle'
-          component='div'>
+          component='h5'>
           {title}
         </Typography>
       )}
       {numSelected > 0 ? (
-        <Tooltip title='Delete'>
+        <Tooltip title='Delete' onClick={onDelete}>
           <IconButton>
             <Delete />
           </IconButton>
         </Tooltip>
-      ) : null}
-      {filter}
+      ) : (
+        children
+      )}
     </Toolbar>
   )
 }

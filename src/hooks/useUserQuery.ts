@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { getUsers, Query } from '../api'
 import { User } from '../types'
 
@@ -9,6 +9,7 @@ const useUserQuery = (filter?: Query) => {
     select: (data): ReadonlyArray<User> =>
       data.map((user) => ({ ...user, id: user.email })),
     staleTime: Infinity,
+    placeholderData: keepPreviousData,
   })
 
   return userQuery

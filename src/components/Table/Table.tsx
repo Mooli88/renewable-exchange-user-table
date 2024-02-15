@@ -31,6 +31,7 @@ type Props = {
   headCells: ReadonlyArray<{ id: string; label: string }>
   title: string
   onFilter: (filterBy: string, value: string) => void
+  onDelete: (userIds: string[]) => void
   children: React.ReactNode
 }
 
@@ -48,17 +49,27 @@ export const TableContext = createContext<Ctx>({
   numSelected: 0,
 })
 
-// const F = () => <Filter filterByCols={headCells} onChange={onFilter} />
-
-const Table = ({ data, headCells, title, onFilter, children }: Props) => {
+const Table = ({
+  data,
+  headCells,
+  title,
+  onFilter,
+  onDelete,
+  children,
+}: Props) => {
   const [order, setOrder] = useState<Order>('asc')
   const [orderBy, setOrderBy] = useState('name')
-  const [selected, setSelected] = useState<ReadonlyArray<string>>([])
+  const [selected, setSelected] = useState<string[]>([])
 
   const rows = useMemo(
     () => data.slice().sort(getComparator(order, orderBy)),
     [data, order, orderBy]
   )
+
+  const handleDeleteUsers = () => {
+    onDelete(selected)
+    setSelected([])
+  }
 
   const handleRequestSort = (property: string) => {
     const isAsc = orderBy === property && order === 'asc'
@@ -94,10 +105,9 @@ const Table = ({ data, headCells, title, onFilter, children }: Props) => {
             handleClick,
             numSelected: selected.length,
           }}>
-          <TableToolbar
-            title={title}
-            filter={<Filter filterByCols={headCells} onChange={onFilter} />}
-          />
+          <TableToolbar title={title} onDelete={handleDeleteUsers}>
+            <Filter filterByCols={headCells} onChange={onFilter} />
+          </TableToolbar>
           <TableContainer>
             <MuiTable sx={{ minWidth: 750 }} aria-labelledby='tableTitle'>
               <TableHead

@@ -5,3 +5,5 @@ export type User = {
   company: string
   added: string
 }
+
+export type NewUser = Omit<User, 'id'>

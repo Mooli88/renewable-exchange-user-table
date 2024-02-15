@@ -1,11 +1,22 @@
-import { User } from './types'
+import { NewUser, User } from './types'
 
 type UserData = Omit<User, 'id'>
 type Data = ReadonlyArray<UserData>
 
 let UsersDB = new Map<string, Data[number]>()
+let shouldPopulateDB = UsersDB.size === 0
 
-const fetchUsers = async (): Promise<Data> => {
+const sleep = async () => {
+  const timeout = Math.floor(Math.random() * 300) + 50
+  await new Promise((resolve) => setTimeout(resolve, timeout))
+}
+
+const populateDB = async (): Promise<Data> => {
+  if (!shouldPopulateDB) {
+    await sleep()
+    return Array.from(UsersDB.values())
+  }
+
   const results = await fetch('https://zglinski.com/trex/users.json')
 
   const users: Data = await results.json()
@@ -23,15 +34,12 @@ export type Query = {
 }
 
 export const getUsers = async (query?: Query): Promise<Data> => {
-  let results = Array.from(UsersDB.values()) as Data
-
-  if (!UsersDB.size) {
-    results = await fetchUsers()
-  }
+  let results = await populateDB()
 
   const { filterBy, value } = query ?? {}
 
   if (value && filterBy && filterBy !== 'none') {
+    await sleep()
     results = results.filter((user) =>
       user[filterBy].toLowerCase().includes(value)
     )
@@ -40,22 +48,20 @@ export const getUsers = async (query?: Query): Promise<Data> => {
   return results
 }
 
-export const AddUsers = async (user: UserData) => {
-  if (!UsersDB.size) {
-    await fetchUsers()
-  }
+export const upsertUser = async (user: NewUser) => {
+  await populateDB()
 
   UsersDB.set(user.email, user)
 
   return Array.from(UsersDB.values())
 }
 
-export const deleteUsers = async (id: string) => {
-  if (!UsersDB.size) {
-    await fetchUsers()
-  }
+export const deleteUsers = async (ids: string[]) => {
+  // in case of removing all users
+  // on revalidate we want to return from local DB
+  shouldPopulateDB = false
 
-  UsersDB.delete(id)
+  ids.forEach((id) => UsersDB.delete(id))
 
   return Array.from(UsersDB.values())
 }
