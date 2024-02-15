@@ -25,7 +25,7 @@ const populateDB = async (): Promise<Data> => {
   UsersDB.clear()
 
   UsersDB = new Map(usersMap)
-
+  shouldPopulateDB = false
   return users
 }
 export type Query = {
@@ -57,10 +57,6 @@ export const upsertUser = async (user: NewUser) => {
 }
 
 export const deleteUsers = async (ids: string[]) => {
-  // in case of removing all users
-  // on revalidate we want to return from local DB
-  shouldPopulateDB = false
-
   ids.forEach((id) => UsersDB.delete(id))
 
   return Array.from(UsersDB.values())

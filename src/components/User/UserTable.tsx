@@ -1,4 +1,4 @@
-import { Box } from '@mui/material'
+import { Backdrop, Box, CircularProgress } from '@mui/material'
 import { useState } from 'react'
 import { Query } from '../../api'
 import useDeleteUsers from '../../hooks/useDeleteUsers'
@@ -8,7 +8,6 @@ import Table from '../Table/Table'
 import AddUserForm from './AddUserForm'
 import UserTableBody from './UserTableBody/UserTableBody'
 
-// type Props = {}
 const headCells = [
   {
     id: 'name',
@@ -30,14 +29,21 @@ const headCells = [
 
 const UserTable = () => {
   const [filterBy, setFilterBy] = useState<Query>()
-  const { data, isLoading } = useUserQuery(filterBy)
+  const { data = [], isFetching, isError } = useUserQuery(filterBy)
   const addUser = useUpsertUser()
   const deleteUsers = useDeleteUsers()
 
-  if (isLoading) return <div>Loading...</div>
+  if (isError) {
+    return <div>Something went wrong</div>
+  }
 
-  if (data)
-    return (
+  return (
+    <>
+      {isFetching ? (
+        <Backdrop open={true}>
+          <CircularProgress color='inherit' />
+        </Backdrop>
+      ) : null}
       <Box sx={{ backgroundColor: 'white', padding: '2em' }}>
         <Table
           title='Users'
@@ -51,9 +57,8 @@ const UserTable = () => {
         </Table>
         <AddUserForm onSubmit={(user) => addUser.mutate(user)} />
       </Box>
-    )
-
-  return <div>Error...</div>
+    </>
+  )
 }
 
 export default UserTable
