@@ -1,6 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { deleteUsers } from '../api'
-import { queryClient } from '../main'
+import { deleteUsers, queryClient } from '../api'
 import { User } from '../types'
 
 export type FilterBy = 'none' | keyof Omit<User, 'id'>

@@ -31,11 +31,26 @@ const AddUserForm = ({ onSubmit }: Props) => {
       </Typography>
       <Box
         component='form'
+        name='add-user-form'
         onSubmit={handleSubmit}
         sx={{ display: 'flex', gap: 1 }}>
-        <TextField name='name' label='Name' />
-        <TextField name='email' label='Email' type='email' />
-        <TextField name='company' label='Company' />
+        <TextField
+          name='name'
+          label='Name'
+          defaultValue='Mooli m'
+          data-testid='name-input'
+        />
+        <TextField
+          name='email'
+          label='Email'
+          type='email'
+          defaultValue='mm@re.com'
+        />
+        <TextField
+          name='company'
+          label='Company'
+          defaultValue='Renewable Exchange'
+        />
         <Button type='submit' variant='contained'>
           Submit
         </Button>

@@ -1,7 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
-import { upsertUser } from '../api'
+import { upsertUser, queryClient } from '../api'
 import { NewUser, User } from '../types'
-import { queryClient } from '../main'
 
 export type FilterBy = 'none' | keyof Omit<User, 'id'>
 

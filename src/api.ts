@@ -1,3 +1,4 @@
+import { QueryClient } from '@tanstack/react-query'
 import { NewUser, User } from './types'
 
 type UserData = Omit<User, 'id'>
@@ -7,6 +8,8 @@ let UsersDB = new Map<string, Data[number]>()
 let shouldPopulateDB = UsersDB.size === 0
 
 const sleep = async () => {
+  if (process.env.NODE_ENV === 'test') return
+
   const timeout = Math.floor(Math.random() * 300) + 50
   await new Promise((resolve) => setTimeout(resolve, timeout))
 }
@@ -61,3 +64,5 @@ export const deleteUsers = async (ids: string[]) => {
 
   return Array.from(UsersDB.values())
 }
+
+export const queryClient = new QueryClient()

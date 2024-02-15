@@ -2,7 +2,7 @@ import { Box, Table as MuiTable, Paper, TableContainer } from '@mui/material'
 import { ChangeEvent, createContext, useMemo, useState } from 'react'
 import TableHead, { Order } from './TableHead/TableHead'
 import TableToolbar from './TableToolbar/TableToolbar'
-import Filter from './TableToolbar/Filter'
+import Filter from '../Filter/Filter'
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
