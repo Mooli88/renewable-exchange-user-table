@@ -6,6 +6,9 @@ on:
     branches: 
       - main
   workflow_dispatch:
+    inputs:
+      use-cache:
+        type: boolean
 
 
 jobs:
@@ -24,8 +27,15 @@ jobs:
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: '1.x'
-
+      - name: Download cached dependencies
+        uses: actions/cache@v4
+        if: ${{inputs.use-cache}}
+        id: cache
+        with:
+          path: node_modules
+          key: deps-node-modules-${{hashFiles('./bun.lockb')}}
       - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
         run: 'bun install --frozen-lockfile'
 
       - name: Lint
