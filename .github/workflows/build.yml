@@ -6,37 +6,50 @@ on:
     branches: 
       - main
   workflow_dispatch:
-    inputs:
-      use-cache:
-        type: boolean
-
 
 jobs:
-  lint: 
+  install-deps:
     runs-on: ubuntu-latest
+    outputs:
+      deps-cache-key: ${{steps.cache-key.outputs.CACHE_KEY}}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
-      # - name: Setup Node
-      #   uses: actions/setup-node@v4
-      #   with:
-      #     node-version: '20.x'
 
       - name: Install Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: '1.x'
+
+      - name: Calc cache key
+        id: cache-key
+        run: |
+          echo "CACHE_KEY=deps-node-modules-${{hashFiles('./bun.lockb')}} >> GITHUB_OUTPUT"
+
       - name: Download cached dependencies
         uses: actions/cache@v4
-        if: ${{inputs.use-cache}}
         id: cache
         with:
           path: node_modules
-          key: deps-node-modules-${{hashFiles('./bun.lockb')}}
+          key: ${{ steps.cache-key.outputs.CACHE_KEY }}
+          
       - name: Install Dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: 'bun install --frozen-lockfile'
+        
+  lint: 
+    needs: install-deps
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download cached dependencies
+        uses: actions/cache@v4
+        id: cache
+        with:
+          path: node_modules
+          key: ${{ needs.install-deps.outputs.deps-cache-key }}
 
       - name: Lint
         run: 'bun run lint'
