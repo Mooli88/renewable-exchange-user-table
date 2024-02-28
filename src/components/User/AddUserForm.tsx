@@ -20,8 +20,9 @@ const AddUserForm = ({ onSubmit }: Props) => {
       added: formatDateToYYYYMMDD(new Date()),
     }
 
-    onSubmit(user)
     e.currentTarget.reset()
+
+    onSubmit(user)
   }
 
   return (
