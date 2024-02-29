@@ -32,5 +32,6 @@ runs:
     - name: Install deps
       if: steps.cache-deps.outputs.cache-hit != 'true'
       shell: bash
-      working-directory: ${{ inputs.working-dir }}
-      run: bun install --frozen-lockfile ${{ inputs.include-dev-deps != 'true' && '--production' }}
+      working-directory: ${{ inputs.working-dir }}/
+      # run: bun install --frozen-lockfile
+      run: ${{ inputs.include-dev-deps == 'true' && 'bun install --frozen-lockfile' || 'bun install --frozen-lockfile --production' }} 

@@ -53,7 +53,7 @@ jobs:
         uses: ./.github/actions/composite-cache-deps
 
       - name: Lint
-        run: 'bun run lint'
+        run: bun run lint
   build:
       # needs: install-deps
       runs-on: ubuntu-latest
