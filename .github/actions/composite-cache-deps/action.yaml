@@ -10,9 +10,6 @@ inputs:
     description: 'Working directory'
     default: '.'
     required: false
-  include-dev-deps:
-    description: 'Include dev dependencies'
-    default: 'true'
 
 runs:
   using: composite
@@ -27,7 +24,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: ${{ inputs.working-dir }}/node_modules
-        key: ${{ runner.os }}-${{ inputs.include-dev-deps == 'true' && 'dev' || 'prod' }}-node-modules-${{ hashFiles(format('{0}/{1}', inputs.working-dir, '/bun.lockb')) }}
+        key: ${{ runner.os }}-node-modules-${{ hashFiles(format('{0}/{1}', inputs.working-dir, '/bun.lockb')) }}
 
     - name: Install deps
       if: steps.cache-deps.outputs.cache-hit != 'true'
