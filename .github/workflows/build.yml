@@ -24,7 +24,7 @@ jobs:
       - name: Calc cache key
         id: cache-key
         run: |
-          echo "CACHE_KEY=deps-node-modules-${{hashFiles('./bun.lockb')}} >> GITHUB_OUTPUT"
+          echo "CACHE_KEY=deps-node-modules-${{hashFiles('./bun.lockb')}}" >> "$GITHUB_OUTPUT"
 
       - name: Download cached dependencies
         uses: actions/cache@v4
