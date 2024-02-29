@@ -1,0 +1,36 @@
+name: Cache app dependencies
+description: Cache app dependencies
+
+inputs:
+  bun-version:
+    description: 'Bun version'
+    default: '1.x'
+    required: false
+  working-dir:
+    description: 'Working directory'
+    default: '.'
+    required: false
+  include-dev-deps:
+    description: 'Include dev dependencies'
+    default: 'true'
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Bun version ${{ inputs.bun-version }}
+      uses: oven-sh/setup-bun@v1
+      with:
+        bun-version: ${{ inputs.bun-version }}
+
+    - name: Cache app dependencies
+      id: cache-deps
+      uses: actions/cache@v4
+      with:
+        path: ${{ inputs.working-dir }}/node_modules
+        key: ${{ runner.os }}-${{ inputs.include-dev-deps == 'true' && 'dev' || 'prod' }}-node-modules-${{ hashFiles(format('{0}/{1}', inputs.working-dir, '/bun.lockb')) }}
+
+    - name: Install deps
+      if: steps.cache-deps.outputs.cache-hit != 'true'
+      shell: bash
+      working-directory: ${{ inputs.working-dir }}
+      run: bun install --frozen-lockfile ${{ inputs.include-dev-deps != 'true' && '--production' }}
