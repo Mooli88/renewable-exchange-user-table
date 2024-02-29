@@ -7,8 +7,13 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  build-artifact-key: app-${{ github.sha }}
+
 jobs:
   install-deps:
+    # skip as i'm using composite action
+    if: false
     runs-on: ubuntu-latest
     outputs:
       deps-cache-key: ${{steps.cache-key.outputs.CACHE_KEY}}
@@ -38,23 +43,42 @@ jobs:
         run: 'bun install --frozen-lockfile'
         
   lint: 
-    needs: install-deps
+    # needs: install-deps
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: '1.x'
-
-      - name: Download cached dependencies
-        uses: actions/cache@v4
-        id: cache
-        with:
-          path: node_modules
-          key: ${{ needs.install-deps.outputs.deps-cache-key }}
+      - name: Install Bun and install deps
+        uses: ./.github/actions/composite-cache-deps
 
       - name: Lint
-        run: 'bun run lint'
+        run: bun run lint
+  build:
+      # needs: install-deps
+      runs-on: ubuntu-latest
+      steps:
+          - name: Checkout code
+            uses: actions/checkout@v4
+
+          - name: Install Bun and install deps
+            uses: ./.github/actions/composite-cache-deps
+        
+          - name: Build code
+            run: bun run build
+
+          - name: Upload build artifacts
+            uses: actions/upload-artifact@v3
+            with:
+              name: ${{env.build-artifact-key}}
+              path: dist
+              retention-days: 1
+  deploy:
+     needs: build
+     runs-on: ubuntu-latest
+     steps:
+       - name: Download build artifacts
+         uses: actions/download-artifact@v3
+         with:
+          name: ${{env.build-artifact-key}}
+          path: dist
